@@ -24,8 +24,7 @@ public class TransactionController {
     }
 
     @GetMapping
-    public List<TransactionResponse> getTransactionsByWallet(
-            @RequestParam Long walletId) {
+    public List<TransactionResponse> getTransactionsByWallet(@RequestParam Long walletId) {
         return transactionService.getTransactionsByWallet(walletId);
     }
 }

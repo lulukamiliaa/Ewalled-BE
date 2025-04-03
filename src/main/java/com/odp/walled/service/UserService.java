@@ -9,6 +9,9 @@ import com.odp.walled.model.User;
 import com.odp.walled.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,9 +27,6 @@ public class UserService {
         }
         if (userRepository.existsByEmail(request.getEmail()))
             throw new DuplicateException("Email already exists");
-
-        if (userRepository.existsByUsername(request.getUsername()))
-            throw new DuplicateException("Username already exists");
         
         User user = userMapper.toEntity(request);
         return userMapper.toResponse(userRepository.save(user));
@@ -36,5 +36,13 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFound("User not found"));
         return userMapper.toResponse(user);
+    }
+
+    public List<User> allUsers() {
+        List<User> users = new ArrayList<>();
+
+        userRepository.findAll().forEach(users::add);
+
+        return users;
     }
 }
