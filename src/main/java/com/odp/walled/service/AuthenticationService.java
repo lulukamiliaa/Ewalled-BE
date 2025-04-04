@@ -2,6 +2,9 @@ package com.odp.walled.service;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,18 +15,17 @@ import com.odp.walled.model.User;
 import com.odp.walled.repository.UserRepository;
 
 @Service
-public class AuthenticationService {
+public class AuthenticationService implements UserDetailsService {
     private final UserRepository userRepository;
-    
+
     private final PasswordEncoder passwordEncoder;
-    
+
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationService(
-        UserRepository userRepository,
-        AuthenticationManager authenticationManager,
-        PasswordEncoder passwordEncoder
-    ) {
+            UserRepository userRepository,
+            AuthenticationManager authenticationManager,
+            PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -36,7 +38,7 @@ public class AuthenticationService {
         }
 
         if (input.getPhoneNumber() != null && userRepository.existsByPhoneNumber(input.getPhoneNumber())) {
-                throw new DuplicateException("Phone number already in use");
+            throw new DuplicateException("Phone number already in use");
         }
 
         User user = new User()
@@ -52,11 +54,16 @@ public class AuthenticationService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         input.getEmail(),
-                        input.getPassword()
-                )
-        );
+                        input.getPassword()));
 
         return userRepository.findByEmail(input.getEmail())
                 .orElseThrow();
     }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    }
+
 }
