@@ -12,9 +12,11 @@ import com.odp.walled.repository.TransactionRepository;
 import com.odp.walled.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,11 +61,48 @@ public class TransactionService {
         return transactionMapper.toResponse(transactionRepository.save(transaction));
     }
 
-    public List<TransactionResponse> getTransactionsByWallet(Long walletId) {
+    // public List<TransactionResponse> getTransactionsByWallet(Long walletId) {
+    //     List<Transaction> transactions = transactionRepository
+    //             .findAllByWalletIdOrRecipientWalletId(walletId);
+    //     return transactions.stream()
+    //             .map(transactionMapper::toResponse)
+    //             .toList();
+    // }
+
+    public List<TransactionResponse> getTransactionsByWallet(Long walletId, LocalDate startDate, LocalDate endDate, TransactionType transactionType) {
+        // List<Transaction> transactions;
+
+        // // If no filters exist, return all transactions for the wallet
+        // if (startDate == null && endDate == null && transactionType == null) {
+        //     transactions = transactionRepository.findAllByWalletIdOrRecipientWalletId(walletId);
+        // } else {
+        //     // Case 2: Some filters exist → Apply filtering dynamically
+        // transactions = transactionRepository.findAllByWalletIdOrRecipientWalletIdAndFilters(walletId, startDate, endDate, transactionType);
+        // }
+
+        //new
+        // List<Transaction> transactions = transactionRepository
+        // .findAllByWalletIdOrRecipientWalletIdAndFilters(walletId, startDate, endDate, transactionType);
+
+        //newer
+        // Convert LocalDate to LocalDateTime
+        LocalDateTime startDateTime = (startDate != null) ? startDate.atStartOfDay() : null;
+        LocalDateTime endDateTime = (endDate != null) ? endDate.atTime(LocalTime.MAX) : null;
+
+        //newer
         List<Transaction> transactions = transactionRepository
                 .findAllByWalletIdOrRecipientWalletId(walletId);
+
+        // return transactions.stream()
+        //         .map(transactionMapper::toResponse)
+        //         .toList();
+
+        //newer
         return transactions.stream()
-                .map(transactionMapper::toResponse)
-                .toList();
+            .filter(t -> startDate == null || !t.getTransactionDate().isBefore(startDateTime))
+            .filter(t -> endDate == null || !t.getTransactionDate().isAfter(endDateTime))
+            .filter(t -> transactionType == null || t.getTransactionType() == transactionType)
+            .map(transactionMapper::toResponse)
+            .toList();
     }
 }
