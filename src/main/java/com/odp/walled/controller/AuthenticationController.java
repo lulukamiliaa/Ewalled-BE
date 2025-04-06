@@ -38,31 +38,15 @@ public class AuthenticationController {
     public ResponseEntity<LoginResponseDto> authenticate(@RequestBody LoginRequestDto loginUserDto) {
         User authenticatedUser = authenticationService.authenticate(loginUserDto);
 
-        // String jwtToken = jwtService.generateToken(authenticatedUser);
-
-        //new
         String accessToken = jwtService.generateAccessToken(authenticatedUser);
         String refreshToken = jwtService.generateRefreshToken(authenticatedUser);
 
-        // LoginResponse loginResponse = new LoginResponse().setToken(jwtToken).setExpiresIn(jwtService.getExpirationTime());
-
-        //new 
-        // ✅ Save refresh token to DB
         refreshTokenService.createRefreshToken(authenticatedUser.getEmail(), refreshToken, jwtService.getRefreshTokenExpiration());
 
-        //new
         LoginResponseDto loginResponse = new LoginResponseDto().setAccessToken(accessToken).setRefreshToken(refreshToken).setExpiresIn(jwtService.getAccessTokenExpiration());
 
         return ResponseEntity.ok(loginResponse);
     }
-
-    //TEMPORARY LOGOUT
-    // @PostMapping("/logout")
-    // public ResponseEntity<String> logout() {
-    //     // Clear authentication context
-    //     SecurityContextHolder.clearContext();
-    //     return ResponseEntity.ok("Logout successful");
-    // }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestParam String email) {
