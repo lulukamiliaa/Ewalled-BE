@@ -1,10 +1,10 @@
-package com.odp.walled.dto;
+package com.odp.walled.dto.user;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
-public class UserRequest {
+public class UserRequestDto {
     @NotBlank
     @Email
     private String email;

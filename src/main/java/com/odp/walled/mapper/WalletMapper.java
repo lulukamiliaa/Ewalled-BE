@@ -1,6 +1,6 @@
 package com.odp.walled.mapper;
 
-import com.odp.walled.dto.WalletResponse;
+import com.odp.walled.dto.wallet.WalletResponseDto;
 import com.odp.walled.model.Wallet;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,5 +11,5 @@ public interface WalletMapper {
     WalletMapper INSTANCE = 
     Mappers.getMapper(WalletMapper.class);
     @Mapping(source = "user.id", target = "userId")
-    WalletResponse toResponse(Wallet wallet);
+    WalletResponseDto toResponse(Wallet wallet);
 }

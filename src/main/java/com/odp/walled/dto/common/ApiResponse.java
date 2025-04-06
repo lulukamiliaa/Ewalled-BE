@@ -1,4 +1,4 @@
-package com.odp.walled.dto;
+package com.odp.walled.dto.common;
 
 import lombok.Data;
 

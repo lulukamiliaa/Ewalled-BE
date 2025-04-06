@@ -1,6 +1,6 @@
-package com.odp.walled.dto;
+package com.odp.walled.dto.auth;
 
-public class LoginResponse {
+public class LoginResponseDto {
     // private String token;
 
     //new 
@@ -23,7 +23,7 @@ public class LoginResponse {
         return accessToken;
     }
 
-    public LoginResponse setAccessToken(String accessToken) {
+    public LoginResponseDto setAccessToken(String accessToken) {
         this.accessToken = accessToken;
         return this;
     }
@@ -32,7 +32,7 @@ public class LoginResponse {
         return refreshToken;
     }
 
-    public LoginResponse setRefreshToken(String refreshToken) {
+    public LoginResponseDto setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
         return this;
     }
@@ -41,7 +41,7 @@ public class LoginResponse {
         return expiresIn;
     }
 
-    public LoginResponse setExpiresIn(long expiresIn) {
+    public LoginResponseDto setExpiresIn(long expiresIn) {
         this.expiresIn = expiresIn;
         return this;
     }

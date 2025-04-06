@@ -1,6 +1,6 @@
 package com.odp.walled.controller;
 
-import com.odp.walled.dto.WalletResponse;
+import com.odp.walled.dto.wallet.WalletResponseDto;
 import com.odp.walled.service.WalletService;
 import lombok.RequiredArgsConstructor;
 
@@ -15,12 +15,12 @@ public class WalletController {
 
     @PostMapping("/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public WalletResponse createWallet(@PathVariable Long userId) {
+    public WalletResponseDto createWallet(@PathVariable Long userId) {
         return walletService.createWallet(userId);
     }
 
     @GetMapping("/{id}")
-    public WalletResponse getWalletById(@PathVariable Long id) {
+    public WalletResponseDto getWalletById(@PathVariable Long id) {
         return walletService.getWalletById(id);
 }
 }

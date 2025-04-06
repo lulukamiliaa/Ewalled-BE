@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.odp.walled.dto.GraphSummaryResponse;
+import com.odp.walled.dto.common.GraphSummaryResponse;
 import com.odp.walled.mapper.TransactionMapper;
 import com.odp.walled.model.Transaction;
 import com.odp.walled.model.Transaction.TransactionType;

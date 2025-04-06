@@ -1,11 +1,12 @@
-package com.odp.walled.dto;
+package com.odp.walled.dto.wallet;
 
 import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-public class WalletResponse {
+public class WalletResponseDto {
     private Long id;
     private Long userId;
     private String accountNumber;

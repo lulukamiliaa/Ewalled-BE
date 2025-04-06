@@ -8,8 +8,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.odp.walled.dto.LoginUserDto;
-import com.odp.walled.dto.RegisterUserDto;
+import com.odp.walled.dto.auth.LoginRequestDto;
+import com.odp.walled.dto.auth.RegisterUserDto;
 import com.odp.walled.exception.DuplicateException;
 import com.odp.walled.model.User;
 import com.odp.walled.repository.UserRepository;
@@ -50,7 +50,7 @@ public class AuthenticationService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    public User authenticate(LoginUserDto input) {
+    public User authenticate(LoginRequestDto input) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         input.getEmail(),
@@ -58,6 +58,10 @@ public class AuthenticationService implements UserDetailsService {
 
         return userRepository.findByEmail(input.getEmail())
                 .orElseThrow();
+    }
+
+    public String encryptPin(String pin) {
+        return passwordEncoder.encode(pin);
     }
 
     @Override

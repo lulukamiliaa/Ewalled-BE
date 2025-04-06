@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.odp.walled.dto.LoginResponse;
-import com.odp.walled.dto.LoginUserDto;
-import com.odp.walled.dto.RegisterUserDto;
+import com.odp.walled.dto.auth.LoginRequestDto;
+import com.odp.walled.dto.auth.LoginResponseDto;
+import com.odp.walled.dto.auth.RegisterUserDto;
 import com.odp.walled.model.User;
 import com.odp.walled.service.AuthenticationService;
 import com.odp.walled.service.JwtService;
@@ -37,7 +37,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto) {
+    public ResponseEntity<LoginResponseDto> authenticate(@RequestBody LoginRequestDto loginUserDto) {
         User authenticatedUser = authenticationService.authenticate(loginUserDto);
 
         // String jwtToken = jwtService.generateToken(authenticatedUser);
@@ -57,7 +57,7 @@ public class AuthenticationController {
         );
 
         //new
-        LoginResponse loginResponse = new LoginResponse()
+        LoginResponseDto loginResponse = new LoginResponseDto()
                 .setAccessToken(accessToken)
                 .setRefreshToken(refreshToken)
                 .setExpiresIn(jwtService.getAccessTokenExpiration());
@@ -81,7 +81,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<LoginResponse> refresh(@RequestParam String refreshToken) {
+    public ResponseEntity<LoginResponseDto> refresh(@RequestParam String refreshToken) {
         if (!refreshTokenService.validateRefreshToken(refreshToken)) {
             return ResponseEntity.status(403).body(null);
         }
@@ -89,12 +89,11 @@ public class AuthenticationController {
         String email = jwtService.extractUsername(refreshToken);
         String newAccessToken = jwtService.generateAccessToken(authenticationService.loadUserByUsername(email));
 
-        LoginResponse response = new LoginResponse()
+        LoginResponseDto response = new LoginResponseDto()
                 .setAccessToken(newAccessToken)
                 .setRefreshToken(refreshToken)
                 .setExpiresIn(jwtService.getAccessTokenExpiration());
 
         return ResponseEntity.ok(response);
     }
-
 }

@@ -1,8 +1,8 @@
 package com.odp.walled.controller;
 
-import com.odp.walled.dto.ApiResponse;
-import com.odp.walled.dto.TransactionRequest;
-import com.odp.walled.dto.TransactionResponse;
+import com.odp.walled.dto.common.ApiResponse;
+import com.odp.walled.dto.transaction.TransactionRequestDto;
+import com.odp.walled.dto.transaction.TransactionResponseDto;
 import com.odp.walled.model.Transaction.TransactionType;
 import com.odp.walled.service.TransactionService;
 import jakarta.validation.Valid;
@@ -25,7 +25,7 @@ public class TransactionController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TransactionResponse createTransaction(@Valid @RequestBody TransactionRequest request) {
+    public TransactionResponseDto createTransaction(@Valid @RequestBody TransactionRequestDto request) {
         return transactionService.processTransaction(request);
     }
 
@@ -40,15 +40,15 @@ public class TransactionController {
     // }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<TransactionResponse>>> getTransactionsByWallet(
+    public ResponseEntity<ApiResponse<List<TransactionResponseDto>>> getTransactionsByWallet(
         @RequestParam Long walletId,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
         @RequestParam(required = false) TransactionType transactionType) {
 
-        List<TransactionResponse> transactions = transactionService.getTransactionsByWallet(walletId, startDate, endDate, transactionType);
-        
-        ApiResponse<List<TransactionResponse>> response = new ApiResponse<>(
+        List<TransactionResponseDto> transactions = transactionService.getTransactionsByWallet(walletId, startDate, endDate, transactionType);
+
+        ApiResponse<List<TransactionResponseDto>> response = new ApiResponse<>(
             "success",
             HttpStatus.OK.value(),
             transactions

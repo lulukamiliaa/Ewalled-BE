@@ -1,7 +1,7 @@
 package com.odp.walled.service;
 
-import com.odp.walled.dto.UserRequest;
-import com.odp.walled.dto.UserResponse;
+import com.odp.walled.dto.user.UserRequestDto;
+import com.odp.walled.dto.user.UserResponseDto;
 import com.odp.walled.exception.DuplicateException;
 import com.odp.walled.exception.ResourceNotFound;
 import com.odp.walled.mapper.UserMapper;
@@ -20,7 +20,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public UserResponse createUser(UserRequest request) {
+    public UserResponseDto createUser(UserRequestDto request) {
         if (request.getPhoneNumber() != null && 
         userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
             throw new DuplicateException("Phone number already in use");
@@ -32,7 +32,7 @@ public class UserService {
         return userMapper.toResponse(userRepository.save(user));
     }
 
-    public UserResponse getUserById(Long id) {
+    public UserResponseDto getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFound("User not found"));
         return userMapper.toResponse(user);

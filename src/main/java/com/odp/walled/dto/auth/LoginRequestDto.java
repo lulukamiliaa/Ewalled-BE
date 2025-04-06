@@ -1,6 +1,6 @@
-package com.odp.walled.dto;
+package com.odp.walled.dto.auth;
 
-public class LoginUserDto {
+public class LoginRequestDto {
     private String email;
     private String password;
 
@@ -8,7 +8,7 @@ public class LoginUserDto {
         return email;
     }
 
-    public LoginUserDto setEmail(String email) {
+    public LoginRequestDto setEmail(String email) {
         this.email = email;
         return this;
     }
@@ -17,7 +17,7 @@ public class LoginUserDto {
         return password;
     }
 
-    public LoginUserDto setPassword(String password) {
+    public LoginRequestDto setPassword(String password) {
         this.password = password;
         return this;
     }

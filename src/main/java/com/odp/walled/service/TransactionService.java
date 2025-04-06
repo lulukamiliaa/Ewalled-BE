@@ -1,7 +1,7 @@
 package com.odp.walled.service;
 
-import com.odp.walled.dto.TransactionRequest;
-import com.odp.walled.dto.TransactionResponse;
+import com.odp.walled.dto.transaction.TransactionRequestDto;
+import com.odp.walled.dto.transaction.TransactionResponseDto;
 import com.odp.walled.exception.InsufficientBalanceException;
 import com.odp.walled.exception.ResourceNotFound;
 import com.odp.walled.mapper.TransactionMapper;
@@ -28,7 +28,7 @@ public class TransactionService {
     private final TransactionMapper transactionMapper;
 
     @Transactional
-    public TransactionResponse processTransaction(TransactionRequest request) {
+    public TransactionResponseDto processTransaction(TransactionRequestDto request) {
         Wallet wallet = walletRepository.findById(request.getWalletId())
                 .orElseThrow(() -> new ResourceNotFound("Wallet not found"));
 
@@ -69,7 +69,7 @@ public class TransactionService {
     //             .toList();
     // }
 
-    public List<TransactionResponse> getTransactionsByWallet(Long walletId, LocalDate startDate, LocalDate endDate, TransactionType transactionType) {
+    public List<TransactionResponseDto> getTransactionsByWallet(Long walletId, LocalDate startDate, LocalDate endDate, TransactionType transactionType) {
         // List<Transaction> transactions;
 
         // // If no filters exist, return all transactions for the wallet

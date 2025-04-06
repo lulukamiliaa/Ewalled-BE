@@ -1,18 +1,18 @@
-package com.odp.walled.dto;
+package com.odp.walled.dto.transaction;
 
 import com.odp.walled.model.Transaction.TransactionType;
-import jakarta.validation.constraints.*;
 import lombok.Data;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
-public class TransactionRequest {
-    @NotNull
+public class TransactionResponseDto {
+    private Long id;
     private Long walletId;
-    @NotNull
     private TransactionType transactionType;
-    @DecimalMin("0.01") @NotNull
     private BigDecimal amount;
-    private String recipientAccountNumber;
+    private Long recipientWalletId;
+    private LocalDateTime transactionDate;
     private String description;
 }

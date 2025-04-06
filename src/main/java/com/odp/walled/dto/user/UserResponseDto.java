@@ -1,9 +1,9 @@
-package com.odp.walled.dto;
+package com.odp.walled.dto.user;
 
 import lombok.Data;
 
 @Data
-public class UserResponse {
+public class UserResponseDto {
     private Long id;
     private String email;
     private String fullname;

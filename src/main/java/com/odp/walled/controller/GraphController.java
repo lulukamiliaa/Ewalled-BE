@@ -3,9 +3,9 @@ package com.odp.walled.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.odp.walled.dto.ApiResponse;
-import com.odp.walled.dto.GraphSummaryResponse;
-import com.odp.walled.dto.TransactionResponse;
+import com.odp.walled.dto.common.ApiResponse;
+import com.odp.walled.dto.common.GraphSummaryResponse;
+import com.odp.walled.dto.transaction.TransactionResponseDto;
 import com.odp.walled.service.GraphService;
 
 import lombok.RequiredArgsConstructor;
