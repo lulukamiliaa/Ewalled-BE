@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage()));
     }
 
-    @ExceptionHandler({DuplicateException.class, InsufficientBalanceException.class})
+    @ExceptionHandler({DuplicateException.class, InsufficientBalanceException.class, PinException.class})
     public ResponseEntity<ErrorResponse> handleBadRequests(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));

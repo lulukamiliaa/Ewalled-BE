@@ -10,7 +10,7 @@ public class UserRequestDto {
     private String email;
     @NotBlank
     @Size(min = 1, max = 70)
-    private String fullname;
+    private String fullName;
     @NotBlank
     private String password;
     private String transactionPin;

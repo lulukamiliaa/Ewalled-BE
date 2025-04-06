@@ -10,9 +10,9 @@ import com.odp.walled.model.Transaction;
 
 @Mapper(componentModel = "spring")
 public interface TransactionMapper {
-
-    @Mapping(source = "wallet.id", target = "walletId")
-    @Mapping(source = "recipientWallet.id", 
-    target = "recipientWalletId")
+    //
+//    @Mapping(source = "wallet.id", target = "walletId")
+//    @Mapping(source = "recipientWallet.id",
+//    target = "recipientWalletId")
     TransactionResponseDto toResponse(Transaction transaction);
 }

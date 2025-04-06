@@ -1,33 +1,45 @@
 package com.odp.walled.model;
 
-import java.util.Collection;
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.*;
-
-import lombok.Data;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true, length = 255)
+    @Email
+    @NotBlank
     private String email;
 
-    @Column(nullable = false, length = 70)
+    @Column(name = "full_name", nullable = false, length = 70)
+    @NotBlank
     private String fullName;
 
     @Column(nullable = false)
+    @NotBlank
     private String password;
 
     @Column(name = "transaction_pin", length = 6)
+    @Pattern(regexp = "\\d{6}", message = "PIN harus 6 digit angka")
     private String transactionPin;
 
     @Column(name = "avatar_url")
@@ -36,115 +48,54 @@ public class User implements UserDetails {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
-    @OneToOne(mappedBy = "user")
-    private Wallet wallet; // Each User has exactly one Wallet
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private Wallet wallet;
+
+    // Spring Security
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // returns the user’s roles list; it is helpful to manage permissions
-        return List.of();
-    }
-
-    public String getPassword() {
-        return password;
+        return List.of(); // customize if roles needed
     }
 
     @Override
     public String getUsername() {
-        //returns the email adress because it's the unique info about the user
-        return email;
+        return this.email; // email as username
+    }
+
+    @Override
+    public String getPassword() {
+        return this.password;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return true; // change if account expiration applied
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return true; // change if lock mechanism applied
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return true; // change if credential expiry applied
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return true; // change if activation flag exists
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public User setId(Long id) {
-        this.id = id;
-        return this;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public User setFullName(String fullName) {
-        this.fullName = fullName;
-        return this;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public User setEmail(String email) {
-        this.email = email;
-        return this;
-    }
-
-    public User setPassword(String password) {
-        this.password = password;
-        return this;
-    }
-    
-    //transactionPin
-    public String getTransactionPin() {
-        return transactionPin;
-    }
-
-    public User setTransactionPin(String transactionPin) {
-        this.transactionPin = transactionPin;
-        return this;
-    }
-
-    //avatarUrl
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public User setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-        return this;
-    }
-
-    //phoneNumber
-    public String getPhoneNumber() {
-        return avatarUrl;
-    }
-
-    public User setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-        return this;
-    }
-    
+    // toString override — exclude password & pin for security
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", fullName='" + fullName + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", transactionPin='" + transactionPin + '\'' +
                 ", avatarUrl='" + avatarUrl + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 '}';

@@ -1,8 +1,16 @@
 package com.odp.walled.controller;
 
+import com.odp.walled.dto.user.UserDto;
+import com.odp.walled.dto.user.UserProfileDto;
 import com.odp.walled.dto.user.UserRequestDto;
 import com.odp.walled.dto.user.UserResponseDto;
+import com.odp.walled.dto.wallet.WalletDto;
+import com.odp.walled.dto.wallet.WalletResponseDto;
+import com.odp.walled.mapper.TransactionMapper;
+import com.odp.walled.mapper.UserMapper;
+import com.odp.walled.mapper.WalletMapper;
 import com.odp.walled.model.User;
+import com.odp.walled.model.WalletType;
 import com.odp.walled.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +28,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final UserMapper userMapper;
+    private final WalletMapper walletMapper;
 
     /**
      * Create a new user.
@@ -50,11 +60,20 @@ public class UserController {
      * @return a ResponseEntity containing the authenticated User
      */
     @GetMapping("/me")
-    public ResponseEntity<User> authenticatedUser() {
+    public ResponseEntity<UserProfileDto> authenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(currentUser);
+
+        UserResponseDto userDto = userMapper.toResponse(currentUser);
+        WalletResponseDto walletDto = walletMapper.toResponse(currentUser.getWallet());
+
+        UserProfileDto profileDto = new UserProfileDto();
+        profileDto.setUser(userDto);
+        profileDto.setWallet(walletDto);
+
+        return ResponseEntity.ok(profileDto);
     }
+
 
     /**
      * Retrieve a list of all users in the system.
