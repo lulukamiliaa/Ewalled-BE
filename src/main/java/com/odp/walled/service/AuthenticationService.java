@@ -60,9 +60,19 @@ public class AuthenticationService implements UserDetailsService {
                 .orElseThrow();
     }
 
-    public String encryptPin(String pin) {
-        return passwordEncoder.encode(pin);
+    public void setPinForUser(String email, String pin) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (user.getTransactionPin() != null) {
+            throw new IllegalStateException("PIN has already been set");
+        }
+
+        String hashedPin = passwordEncoder.encode(pin);
+        user.setTransactionPin(hashedPin);
+        userRepository.save(user);
     }
+
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

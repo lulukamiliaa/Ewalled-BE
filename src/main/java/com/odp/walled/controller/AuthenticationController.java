@@ -1,5 +1,6 @@
 package com.odp.walled.controller;
 
+import com.odp.walled.dto.auth.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,9 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.odp.walled.dto.auth.LoginRequestDto;
-import com.odp.walled.dto.auth.LoginResponseDto;
-import com.odp.walled.dto.auth.RegisterUserDto;
 import com.odp.walled.model.User;
 import com.odp.walled.service.AuthenticationService;
 import com.odp.walled.service.JwtService;
@@ -96,4 +94,11 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/set-pin")
+    public ResponseEntity<String> setPin(@RequestBody SetPinRequestDto request) {
+        authenticationService.setPinForUser(request.getEmail(), request.getPin());
+        return ResponseEntity.ok("PIN has been set successfully.");
+    }
+
 }
