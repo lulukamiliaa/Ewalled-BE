@@ -38,8 +38,7 @@ public class User implements UserDetails {
     @NotBlank
     private String password;
 
-    @Column(name = "transaction_pin", length = 6)
-    @Pattern(regexp = "\\d{6}", message = "PIN harus 6 digit angka")
+    @Column(name = "transaction_pin", length = 100)
     private String transactionPin;
 
     @Column(name = "avatar_url")
