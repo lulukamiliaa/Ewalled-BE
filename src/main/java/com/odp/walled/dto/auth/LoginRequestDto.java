@@ -1,20 +1,15 @@
 package com.odp.walled.dto.auth;
 
+import lombok.Getter;
+
+@Getter
 public class LoginRequestDto {
     private String email;
     private String password;
 
-    public String getEmail() {
-        return email;
-    }
-
     public LoginRequestDto setEmail(String email) {
         this.email = email;
         return this;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public LoginRequestDto setPassword(String password) {
