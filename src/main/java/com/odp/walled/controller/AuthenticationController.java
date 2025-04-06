@@ -1,18 +1,18 @@
 package com.odp.walled.controller;
 
-import com.odp.walled.dto.auth.*;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.odp.walled.dto.auth.LoginRequestDto;
+import com.odp.walled.dto.auth.LoginResponseDto;
+import com.odp.walled.dto.auth.RegisterUserDto;
+import com.odp.walled.dto.auth.SetPinRequestDto;
+import com.odp.walled.dto.common.ApiResponse;
 import com.odp.walled.model.User;
 import com.odp.walled.service.AuthenticationService;
 import com.odp.walled.service.JwtService;
 import com.odp.walled.service.RefreshTokenService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/auth")
 @RestController
@@ -48,17 +48,10 @@ public class AuthenticationController {
 
         //new 
         // ✅ Save refresh token to DB
-        refreshTokenService.createRefreshToken(
-            authenticatedUser.getEmail(),
-            refreshToken,
-            jwtService.getRefreshTokenExpiration()
-        );
+        refreshTokenService.createRefreshToken(authenticatedUser.getEmail(), refreshToken, jwtService.getRefreshTokenExpiration());
 
         //new
-        LoginResponseDto loginResponse = new LoginResponseDto()
-                .setAccessToken(accessToken)
-                .setRefreshToken(refreshToken)
-                .setExpiresIn(jwtService.getAccessTokenExpiration());
+        LoginResponseDto loginResponse = new LoginResponseDto().setAccessToken(accessToken).setRefreshToken(refreshToken).setExpiresIn(jwtService.getAccessTokenExpiration());
 
         return ResponseEntity.ok(loginResponse);
     }
@@ -87,10 +80,7 @@ public class AuthenticationController {
         String email = jwtService.extractUsername(refreshToken);
         String newAccessToken = jwtService.generateAccessToken(authenticationService.loadUserByUsername(email));
 
-        LoginResponseDto response = new LoginResponseDto()
-                .setAccessToken(newAccessToken)
-                .setRefreshToken(refreshToken)
-                .setExpiresIn(jwtService.getAccessTokenExpiration());
+        LoginResponseDto response = new LoginResponseDto().setAccessToken(newAccessToken).setRefreshToken(refreshToken).setExpiresIn(jwtService.getAccessTokenExpiration());
 
         return ResponseEntity.ok(response);
     }
@@ -101,4 +91,15 @@ public class AuthenticationController {
         return ResponseEntity.ok("PIN has been set successfully.");
     }
 
+    @PostMapping("/verify-pin")
+    public ResponseEntity<ApiResponse<Void>> verify(@RequestBody SetPinRequestDto request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        boolean isPinValid = authenticationService.verifyPin(email, request.getPin());
+
+        if (isPinValid) {
+            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("PIN has been verified successfully.", null));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("Invalid PIN.", HttpStatus.UNAUTHORIZED.value()));
+        }
+    }
 }

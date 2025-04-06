@@ -79,6 +79,14 @@ public class AuthenticationService implements UserDetailsService {
         userRepository.save(user);
     }
 
+    public boolean verifyPin(String email, String pin) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+
+        // Compare input PIN (plaintext) with hashed transactionPin
+        return passwordEncoder.matches(pin, user.getTransactionPin());
+    }
+
     /**
      * Load user by email for Spring Security
      */
