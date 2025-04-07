@@ -72,9 +72,9 @@ public class UserController {
     }
 
     /**
-     * POST endpoint to check if the current authenticated user has set a transaction PIN.
+     * Check if the current authenticated user has set a transaction PIN.
      *
-     * @return true if PIN is set, false otherwise
+     * @return ResponseEntity containing ApiResponse with true if PIN is set, ApiResponse false otherwise.
      */
     @PostMapping("/has-pin")
     public ResponseEntity<ApiResponse<Boolean>> hasTransactionPin() {
