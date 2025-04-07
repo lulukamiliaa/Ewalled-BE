@@ -39,8 +39,7 @@ public class AuthenticationController {
         User user = authenticationService.signup(registerRequestDto);
         UserResponseDto dto = userMapper.toResponse(user);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(HttpStatus.CREATED.value(), "User registered successfully.", dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(HttpStatus.CREATED.value(), "User registered successfully.", dto));
     }
 
 
@@ -53,10 +52,7 @@ public class AuthenticationController {
 
         refreshTokenService.createRefreshToken(authenticatedUser.getEmail(), refreshToken, jwtService.getRefreshTokenExpiration());
 
-        LoginResponseDto loginResponse = new LoginResponseDto()
-                .setAccessToken(accessToken)
-                .setRefreshToken(refreshToken)
-                .setExpiresIn(jwtService.getAccessTokenExpiration());
+        LoginResponseDto loginResponse = new LoginResponseDto().setAccessToken(accessToken).setRefreshToken(refreshToken).setExpiresIn(jwtService.getAccessTokenExpiration());
 
         return ResponseEntity.ok(ApiResponse.success("Login successful", loginResponse));
     }
@@ -72,17 +68,13 @@ public class AuthenticationController {
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<LoginResponseDto>> refresh(@RequestParam String refreshToken) {
         if (!refreshTokenService.validateRefreshToken(refreshToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.error(HttpStatus.FORBIDDEN.value(), "Invalid refresh token.", null));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error(HttpStatus.FORBIDDEN.value(), "Invalid refresh token.", null));
         }
 
         String email = jwtService.extractUsername(refreshToken);
         String newAccessToken = jwtService.generateAccessToken(authenticationService.loadUserByUsername(email));
 
-        LoginResponseDto response = new LoginResponseDto()
-                .setAccessToken(newAccessToken)
-                .setRefreshToken(refreshToken)
-                .setExpiresIn(jwtService.getAccessTokenExpiration());
+        LoginResponseDto response = new LoginResponseDto().setAccessToken(newAccessToken).setRefreshToken(refreshToken).setExpiresIn(jwtService.getAccessTokenExpiration());
 
         return ResponseEntity.ok(ApiResponse.success("Token refreshed successfully", response));
     }
@@ -102,8 +94,7 @@ public class AuthenticationController {
         if (isPinValid) {
             return ResponseEntity.ok(ApiResponse.success("PIN has been verified successfully.", null));
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.error(HttpStatus.UNAUTHORIZED.value(), "Invalid PIN."));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error(HttpStatus.UNAUTHORIZED.value(), "Invalid PIN."));
         }
     }
 }

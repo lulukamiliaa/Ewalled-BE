@@ -14,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -61,7 +58,6 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("User profile fetched successfully", profileDto));
     }
 
-
     /**
      * Retrieve a list of all users in the system.
      *
@@ -74,4 +70,20 @@ public class UserController {
 
         return ResponseEntity.ok(ApiResponse.success("List of users fetched successfully", summaries));
     }
+
+    /**
+     * POST endpoint to check if the current authenticated user has set a transaction PIN.
+     *
+     * @return true if PIN is set, false otherwise
+     */
+    @PostMapping("/has-pin")
+    public ResponseEntity<ApiResponse<Boolean>> hasTransactionPin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+
+        boolean hasPin = currentUser.getTransactionPin() != null;
+
+        return ResponseEntity.ok(ApiResponse.success("Check PIN status success", hasPin));
+    }
+
 }
