@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -14,8 +16,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -51,6 +52,9 @@ public class User implements UserDetails {
     @JsonManagedReference
     private Wallet wallet;
 
+    public String getEmail() {
+        return this.email;
+    }
     // Spring Security
 
     @Override
@@ -85,10 +89,9 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true; // change if activation flag exists
+        return true;
     }
 
-    // toString override — exclude password & pin for security
     @Override
     public String toString() {
         return "User{" +

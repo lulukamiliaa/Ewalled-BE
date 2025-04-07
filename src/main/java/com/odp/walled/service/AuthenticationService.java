@@ -1,7 +1,7 @@
 package com.odp.walled.service;
 
 import com.odp.walled.dto.auth.LoginRequestDto;
-import com.odp.walled.dto.auth.RegisterUserDto;
+import com.odp.walled.dto.auth.RegisterRequestDto;
 import com.odp.walled.exception.DuplicateException;
 import com.odp.walled.exception.PinException;
 import com.odp.walled.model.User;
@@ -28,7 +28,7 @@ public class AuthenticationService implements UserDetailsService {
      * Register a new user
      */
     @Transactional
-    public User signup(RegisterUserDto input) {
+    public User signup(RegisterRequestDto input) {
         if (userRepository.findByEmail(input.getEmail()).isPresent()) {
             throw new DuplicateException("Email already exists. Please log in.");
         }

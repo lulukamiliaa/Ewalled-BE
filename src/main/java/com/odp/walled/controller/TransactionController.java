@@ -42,8 +42,8 @@ public class TransactionController {
 
         List<TransactionResponseDto> transactions = transactionService.getTransactionsByWallet(walletId, startDate, endDate, transactionType);
 
-        ApiResponse<List<TransactionResponseDto>> response = new ApiResponse<>(true, "Transaction list fetched successfully.", HttpStatus.OK.value(), transactions);
 
+        ApiResponse<List<TransactionResponseDto>> response = ApiResponse.success("Transaction list fetched successfully.", transactions);
         return ResponseEntity.ok(response);
     }
 }

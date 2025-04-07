@@ -2,7 +2,10 @@ package com.odp.walled.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -23,6 +26,10 @@ public class Wallet {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     @JsonBackReference
     private User user;
+
+    public User getUser() {
+        return this.user;
+    }
 
     @NotBlank(message = "Nomor akun tidak boleh kosong")
     @Size(max = 20, message = "Nomor akun maksimal 20 karakter")

@@ -1,31 +1,36 @@
 package com.odp.walled.dto.common;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class ApiResponse<T> {
-    private boolean success;
+
+    private int responseCode;
     private String message;
-    private int statusCode;
     private T data;
 
+    public ApiResponse(int responseCode, String message, T data) {
+        this.responseCode = responseCode;
+        this.message = message;
+        this.data = data;
+    }
+
+
     public static <T> ApiResponse<T> success(String message, T data) {
-        return new ApiResponse<>(true, message, 200, data);
+        return new ApiResponse<>(200, message, data);
     }
 
-    public static <T> ApiResponse<T> success(String message, int statusCode, T data) {
-        return new ApiResponse<>(true, message, statusCode, data);
+    public static <T> ApiResponse<T> success(int responseCode, String message, T data) {
+        return new ApiResponse<>(responseCode, message, data);
     }
 
-    public static <T> ApiResponse<T> error(String message, int statusCode, T data) {
-        return new ApiResponse<>(false, message, statusCode, data);
+    public static <T> ApiResponse<T> error(int responseCode, String message, T data) {
+        return new ApiResponse<>(responseCode, message, data);
     }
 
-    public static ApiResponse<Void> error(String message, int statusCode) {
-        return new ApiResponse<>(false, message, statusCode, null);
+    public static <T> ApiResponse<T> error(int responseCode, String message) {
+        return new ApiResponse<>(responseCode, message, null);
     }
 }
