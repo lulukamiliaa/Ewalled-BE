@@ -1,27 +1,25 @@
 package com.odp.walled.controller;
 
-import com.odp.walled.dto.user.UserDto;
+import com.odp.walled.dto.common.ApiResponse;
 import com.odp.walled.dto.user.UserProfileDto;
-import com.odp.walled.dto.user.UserRequestDto;
 import com.odp.walled.dto.user.UserResponseDto;
-import com.odp.walled.dto.wallet.WalletDto;
+import com.odp.walled.dto.user.UserWalletSummaryDto;
 import com.odp.walled.dto.wallet.WalletResponseDto;
-import com.odp.walled.mapper.TransactionMapper;
 import com.odp.walled.mapper.UserMapper;
+import com.odp.walled.mapper.UserWalletSummaryMapper;
 import com.odp.walled.mapper.WalletMapper;
 import com.odp.walled.model.User;
-import com.odp.walled.model.WalletType;
 import com.odp.walled.service.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -30,18 +28,7 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
     private final WalletMapper walletMapper;
-
-    /**
-     * Create a new user.
-     *
-     * @param request the user data in the request body
-     * @return the created user as a UserResponse
-     */
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseDto createUser(@Valid @RequestBody UserRequestDto request) {
-        return userService.createUser(request);
-    }
+    private final UserWalletSummaryMapper userWalletSummaryMapper;
 
     /**
      * Retrieve a user by their ID.
@@ -60,7 +47,7 @@ public class UserController {
      * @return a ResponseEntity containing the authenticated User
      */
     @GetMapping("/me")
-    public ResponseEntity<UserProfileDto> authenticatedUser() {
+    public ResponseEntity<ApiResponse<UserProfileDto>> authenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
 
@@ -71,7 +58,7 @@ public class UserController {
         profileDto.setUser(userDto);
         profileDto.setWallet(walletDto);
 
-        return ResponseEntity.ok(profileDto);
+        return ResponseEntity.ok(ApiResponse.success("User profile fetched successfully", profileDto));
     }
 
 
@@ -81,8 +68,10 @@ public class UserController {
      * @return a ResponseEntity containing a list of User objects
      */
     @GetMapping("/")
-    public ResponseEntity<List<User>> allUsers() {
+    public ResponseEntity<ApiResponse<List<UserWalletSummaryDto>>> allUsers() {
         List<User> users = userService.allUsers();
-        return ResponseEntity.ok(users);
+        List<UserWalletSummaryDto> summaries = userWalletSummaryMapper.toSummaryList(users);
+
+        return ResponseEntity.ok(ApiResponse.success("List of users fetched successfully", summaries));
     }
 }
