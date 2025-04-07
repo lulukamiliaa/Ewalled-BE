@@ -77,8 +77,6 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGlobalException(Exception exception) {
-        exception.printStackTrace(); // TODO: Integrate with observability/logging system
-
         if (exception instanceof BadCredentialsException) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error(HttpStatus.UNAUTHORIZED.value(), "The email or password is incorrect"));
         }
