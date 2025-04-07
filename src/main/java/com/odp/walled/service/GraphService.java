@@ -1,20 +1,16 @@
 package com.odp.walled.service;
 
+import com.odp.walled.dto.common.GraphSummaryResponse;
+import com.odp.walled.model.Transaction;
+import com.odp.walled.model.Transaction.TransactionType;
+import com.odp.walled.repository.TransactionRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import org.springframework.stereotype.Service;
-
-import com.odp.walled.dto.common.GraphSummaryResponse;
-import com.odp.walled.mapper.TransactionMapper;
-import com.odp.walled.model.Transaction;
-import com.odp.walled.model.Transaction.TransactionType;
-import com.odp.walled.repository.TransactionRepository;
-import com.odp.walled.repository.WalletRepository;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -32,36 +28,15 @@ public class GraphService {
             fromDate = LocalDateTime.now().minusMonths(3);
         }
 
-        List<Transaction> transactions = (fromDate != null)
-                ? transactionRepository.findByWalletIdAndTransactionDateAfter(walletId, fromDate)
-                : transactionRepository.findAllByWalletIdOrRecipientWalletId(walletId);
+        List<Transaction> transactions = (fromDate != null) ? transactionRepository.findByWalletIdAndTransactionDateAfter(walletId, fromDate) : transactionRepository.findAllByWalletIdOrRecipientWalletId(walletId);
 
-        BigDecimal income = transactions.stream()
-                .filter(t ->
-                        (t.getTransactionType() == TransactionType.TOP_UP &&
-                         t.getWallet().getId().equals(walletId)) ||
-                        (t.getTransactionType() == TransactionType.TRANSFER &&
-                         t.getRecipientWallet() != null &&
-                         t.getRecipientWallet().getId().equals(walletId))
-                )
-                .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal income = transactions.stream().filter(t -> (t.getTransactionType() == TransactionType.TOP_UP && t.getWallet().getId().equals(walletId)) || (t.getTransactionType() == TransactionType.TRANSFER && t.getRecipientWallet() != null && t.getRecipientWallet().getId().equals(walletId))).map(Transaction::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal expense = transactions.stream()
-                .filter(t ->
-                        t.getTransactionType() == TransactionType.TRANSFER &&
-                        t.getWallet().getId().equals(walletId) &&
-                        t.getRecipientWallet() != null &&
-                        !t.getRecipientWallet().getId().equals(walletId)
-                )
-                .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal expense = transactions.stream().filter(t -> t.getTransactionType() == TransactionType.TRANSFER && t.getWallet().getId().equals(walletId) && t.getRecipientWallet() != null && !t.getRecipientWallet().getId().equals(walletId)).map(Transaction::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal savingPercentage = BigDecimal.ZERO;
         if (income.compareTo(BigDecimal.ZERO) > 0) {
-            savingPercentage = income.subtract(expense)
-                    .divide(income, 4, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
+            savingPercentage = income.subtract(expense).divide(income, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
         }
 
         GraphSummaryResponse response = new GraphSummaryResponse();

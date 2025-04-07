@@ -4,7 +4,6 @@ import com.odp.walled.dto.wallet.WalletResponseDto;
 import com.odp.walled.exception.ResourceNotFound;
 import com.odp.walled.exception.WalletAlreadyExistsException;
 import com.odp.walled.mapper.WalletMapper;
-import com.odp.walled.model.User;
 import com.odp.walled.model.Wallet;
 import com.odp.walled.model.WalletType;
 import com.odp.walled.repository.UserRepository;
@@ -32,15 +31,18 @@ public class WalletService {
      * @param userId the ID of the user
      * @return the newly created {@link WalletResponseDto}
      * @throws WalletAlreadyExistsException if the user already has a wallet
+     * @throws ResourceNotFound             if the user does not exist
      */
     public WalletResponseDto createWallet(Long userId) {
-        User user = findUserById(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new ResourceNotFound("User not found");
+        }
 
-        if (user.getWallet() != null) {
+        if (walletRepository.findByUserId(userId).isPresent()) {
             throw new WalletAlreadyExistsException("User already has a wallet.");
         }
 
-        Wallet newWallet = Wallet.builder().user(user).accountNumber(generateUniqueAccountNumber()).balance(BigDecimal.ZERO).type(WalletType.PERSONAL).build();
+        Wallet newWallet = Wallet.builder().userId(userId).accountNumber(generateUniqueAccountNumber()).balance(BigDecimal.ZERO).type(WalletType.PERSONAL).build();
 
         walletRepository.save(newWallet);
         return walletMapper.toResponse(newWallet);
@@ -50,19 +52,30 @@ public class WalletService {
      * Retrieves a wallet by its unique ID.
      *
      * @param walletId the ID of the wallet
-     * @return the {@link WalletResponseDto} of the wallet
+     * @return the {@link WalletResponseDto}
      * @throws ResourceNotFound if the wallet does not exist
      */
     public WalletResponseDto getWalletById(Long walletId) {
         Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new ResourceNotFound("Wallet not found"));
+        return walletMapper.toResponse(wallet);
+    }
 
+    /**
+     * Retrieves a wallet using the associated user ID.
+     *
+     * @param userId the user ID
+     * @return the {@link WalletResponseDto}
+     * @throws ResourceNotFound if the wallet does not exist for the given user
+     */
+    public WalletResponseDto getWalletByUserId(Long userId) {
+        Wallet wallet = walletRepository.findByUserId(userId).orElseThrow(() -> new ResourceNotFound("Wallet not found for user ID: " + userId));
         return walletMapper.toResponse(wallet);
     }
 
     /**
      * Generates a unique 12-digit numeric account number.
      *
-     * @return a unique account number as a string
+     * @return a unique account number string
      */
     private String generateUniqueAccountNumber() {
         Random random = new Random();
@@ -73,15 +86,5 @@ public class WalletService {
         } while (walletRepository.existsByAccountNumber(accountNumber));
 
         return accountNumber;
-    }
-
-    /**
-     * Fetches a user entity by ID, or throws {@link ResourceNotFound} if not found.
-     *
-     * @param userId the ID of the user
-     * @return the {@link User} entity
-     */
-    private User findUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new ResourceNotFound("User not found"));
     }
 }

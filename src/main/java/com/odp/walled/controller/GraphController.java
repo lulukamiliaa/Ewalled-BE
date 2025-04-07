@@ -1,21 +1,14 @@
 package com.odp.walled.controller;
 
+import com.odp.walled.dto.common.GraphSummaryResponse;
+import com.odp.walled.service.GraphService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.odp.walled.dto.common.ApiResponse;
-import com.odp.walled.dto.common.GraphSummaryResponse;
-import com.odp.walled.dto.transaction.TransactionResponseDto;
-import com.odp.walled.service.GraphService;
-
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/analytics")
@@ -24,7 +17,7 @@ public class GraphController {
     private final GraphService graphService;
 
     @GetMapping("/summary")
-    public List<GraphSummaryResponse> getSummaryByWallet(@RequestParam Long walletId, @RequestParam(required = false) String period) {     
+    public List<GraphSummaryResponse> getSummaryByWallet(@RequestParam Long walletId, @RequestParam(required = false) String period) {
         return graphService.getSummaryByWallet(walletId, period);
     }
 

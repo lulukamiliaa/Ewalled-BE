@@ -1,6 +1,7 @@
 package com.odp.walled.model;
 
 import jakarta.persistence.*;
+
 import java.util.Date;
 
 @Entity
@@ -36,7 +37,7 @@ public class RefreshToken {
         this.token = token;
         return this;
     }
-    
+
     public String getEmail() {
         return email;
     }

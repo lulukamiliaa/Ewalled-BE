@@ -6,14 +6,12 @@ import com.odp.walled.dto.user.UserResponseDto;
 import com.odp.walled.dto.user.UserWalletSummaryDto;
 import com.odp.walled.dto.wallet.WalletResponseDto;
 import com.odp.walled.mapper.UserMapper;
-import com.odp.walled.mapper.UserWalletSummaryMapper;
-import com.odp.walled.mapper.WalletMapper;
 import com.odp.walled.model.User;
 import com.odp.walled.service.UserService;
+import com.odp.walled.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,16 +20,16 @@ import java.util.List;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
+    private final WalletService walletService;
     private final UserMapper userMapper;
-    private final WalletMapper walletMapper;
-    private final UserWalletSummaryMapper userWalletSummaryMapper;
 
     /**
-     * Retrieve a user by their ID.
+     * Retrieve user by ID.
      *
      * @param id the ID of the user
-     * @return the corresponding user wrapped in an ApiResponse
+     * @return ApiResponse containing UserResponseDto
      */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserResponseDto>> getUserById(@PathVariable Long id) {
@@ -40,17 +38,15 @@ public class UserController {
     }
 
     /**
-     * Returns the currently authenticated user from the SecurityContext.
+     * Retrieve the authenticated user's profile.
      *
-     * @return a ResponseEntity containing the authenticated User
+     * @param currentUser the authenticated user from security context
+     * @return ApiResponse containing UserProfileDto
      */
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserProfileDto>> authenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-
+    public ResponseEntity<ApiResponse<UserProfileDto>> authenticatedUser(@AuthenticationPrincipal User currentUser) {
         UserResponseDto userDto = userMapper.toResponse(currentUser);
-        WalletResponseDto walletDto = walletMapper.toResponse(currentUser.getWallet());
+        WalletResponseDto walletDto = walletService.getWalletByUserId(currentUser.getId());
 
         UserProfileDto profileDto = new UserProfileDto();
         profileDto.setUser(userDto);
@@ -60,31 +56,25 @@ public class UserController {
     }
 
     /**
-     * Retrieve a list of all users in the system.
+     * Retrieve all users with minimal profile and wallet summary.
      *
-     * @return a ResponseEntity containing a list of User objects
+     * @return ApiResponse containing list of UserWalletSummaryDto
      */
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<ApiResponse<List<UserWalletSummaryDto>>> allUsers() {
-        List<User> users = userService.allUsers();
-        List<UserWalletSummaryDto> summaries = userWalletSummaryMapper.toSummaryList(users);
-
+        List<UserWalletSummaryDto> summaries = userService.allUsers();
         return ResponseEntity.ok(ApiResponse.success("List of users fetched successfully", summaries));
     }
 
     /**
-     * Check if the current authenticated user has set a transaction PIN.
+     * Check if the authenticated user has set a transaction PIN.
      *
-     * @return ResponseEntity containing ApiResponse with true if PIN is set, ApiResponse false otherwise.
+     * @param currentUser the authenticated user
+     * @return ApiResponse with true if PIN is set, false otherwise
      */
     @PostMapping("/has-pin")
-    public ResponseEntity<ApiResponse<Boolean>> hasTransactionPin() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-
+    public ResponseEntity<ApiResponse<Boolean>> hasTransactionPin(@AuthenticationPrincipal User currentUser) {
         boolean hasPin = currentUser.getTransactionPin() != null;
-
-        return ResponseEntity.ok(ApiResponse.success("Check PIN status success", hasPin));
+        return ResponseEntity.ok(ApiResponse.success("Transaction PIN status checked", hasPin));
     }
-
 }

@@ -1,6 +1,5 @@
 package com.odp.walled.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -29,19 +28,17 @@ import java.time.LocalDateTime;
 public class Wallet {
 
     /**
-     * The unique identifier of the wallet.
+     * Unique identifier for the wallet.
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
-     * The user that owns this wallet.
+     * The ID of the user who owns this wallet.
      */
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
-    @JsonBackReference
-    private User user;
+    @Column(name = "user_id", nullable = false, unique = true)
+    private Long userId;
 
     /**
      * The unique account number associated with this wallet.
@@ -54,7 +51,7 @@ public class Wallet {
     /**
      * The balance in the wallet. Cannot be negative.
      */
-    @DecimalMin(value = "0.00", message = "Balance must not be negative")
+    @DecimalMin(value = "0.00", inclusive = true, message = "Balance must not be negative")
     @Digits(integer = 12, fraction = 2, message = "Invalid balance format")
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
@@ -67,14 +64,14 @@ public class Wallet {
     private WalletType type = WalletType.PERSONAL;
 
     /**
-     * The timestamp of when the wallet was created.
+     * The timestamp when the wallet was created.
      */
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     /**
-     * The timestamp of when the wallet was last updated.
+     * The timestamp when the wallet was last updated.
      */
     @UpdateTimestamp
     @Column(name = "updated_at")

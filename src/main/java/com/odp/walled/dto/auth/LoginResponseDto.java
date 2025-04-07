@@ -26,10 +26,6 @@ public class LoginResponseDto {
 
     @Override
     public String toString() {
-        return "LoginResponse{" +
-                "accessToken='" + accessToken + '\'' +
-                ", refreshToken='" + refreshToken + '\'' +
-                ", expiresIn=" + expiresIn +
-                '}';
+        return "LoginResponse{" + "accessToken='" + accessToken + '\'' + ", refreshToken='" + refreshToken + '\'' + ", expiresIn=" + expiresIn + '}';
     }
 }

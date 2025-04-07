@@ -37,12 +37,7 @@ public class AuthenticationService implements UserDetailsService {
             throw new DuplicateException("Phone number already in use.");
         }
 
-        User newUser = User.builder()
-                .email(input.getEmail())
-                .fullName(input.getFullName())
-                .password(passwordEncoder.encode(input.getPassword()))
-                .phoneNumber(input.getPhoneNumber())
-                .build();
+        User newUser = User.builder().email(input.getEmail()).fullName(input.getFullName()).password(passwordEncoder.encode(input.getPassword())).phoneNumber(input.getPhoneNumber()).build();
 
         return userRepository.save(newUser);
     }
@@ -51,12 +46,9 @@ public class AuthenticationService implements UserDetailsService {
      * Authenticate user login
      */
     public User authenticate(LoginRequestDto input) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword())
-        );
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword()));
 
-        return userRepository.findByEmail(input.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("Invalid credentials"));
+        return userRepository.findByEmail(input.getEmail()).orElseThrow(() -> new UsernameNotFoundException("Invalid credentials"));
     }
 
     /**
@@ -68,8 +60,7 @@ public class AuthenticationService implements UserDetailsService {
             throw new PinException("PIN must be exactly 6 digits.");
         }
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found."));
 
         if (user.getTransactionPin() != null) {
             throw new PinException("PIN has already been set.");
@@ -80,8 +71,7 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     public boolean verifyPin(String email, String pin) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found."));
 
         // Compare input PIN (plaintext) with hashed transactionPin
         return passwordEncoder.matches(pin, user.getTransactionPin());
@@ -92,7 +82,6 @@ public class AuthenticationService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 }

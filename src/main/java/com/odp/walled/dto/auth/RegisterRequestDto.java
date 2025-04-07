@@ -35,9 +35,6 @@ public class RegisterRequestDto {
 
     @Override
     public String toString() {
-        return "RegisterUserDto{" +
-                "email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                '}';
+        return "RegisterUserDto{" + "email='" + email + '\'' + ", password='" + password + '\'' + '}';
     }
 }

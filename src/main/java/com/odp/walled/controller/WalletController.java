@@ -32,8 +32,9 @@ public class WalletController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<WalletResponseDto>> createWalletForAuthenticatedUser(@AuthenticationPrincipal User currentUser) {
+
         WalletResponseDto wallet = walletService.createWallet(currentUser.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(201, "Wallet created successfully", wallet));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(HttpStatus.CREATED.value(), "Wallet created successfully", wallet));
     }
 
     /**
@@ -44,10 +45,11 @@ public class WalletController {
      */
     @GetMapping("/balance")
     public ResponseEntity<ApiResponse<WalletBalanceDto>> getAuthenticatedUserBalance(@AuthenticationPrincipal User currentUser) {
-        WalletResponseDto wallet = walletService.getWalletById(currentUser.getWallet().getId());
+
+        WalletResponseDto wallet = walletService.getWalletByUserId(currentUser.getId());
 
         if (wallet == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(404, "Wallet not found for the current user"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(HttpStatus.NOT_FOUND.value(), "Wallet not found for the current user"));
         }
 
         WalletBalanceDto balanceDto = new WalletBalanceDto(wallet.getId(), wallet.getAccountNumber(), wallet.getBalance());
