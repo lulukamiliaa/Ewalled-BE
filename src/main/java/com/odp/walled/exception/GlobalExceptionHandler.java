@@ -15,19 +15,41 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Global handler for application-wide exceptions.
+ * Converts exceptions into standardized API responses.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * Handles exceptions when a requested resource is not found.
+     *
+     * @param ex the thrown {@link ResourceNotFound}
+     * @return standardized 404 response
+     */
     @ExceptionHandler(ResourceNotFound.class)
     public ResponseEntity<ApiResponse<Void>> handleNotFound(ResourceNotFound ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(HttpStatus.NOT_FOUND.value(), ex.getMessage()));
     }
 
+    /**
+     * Handles common business logic exceptions.
+     *
+     * @param ex the thrown {@link RuntimeException} (e.g., duplicate, balance, or PIN errors)
+     * @return standardized 400 response
+     */
     @ExceptionHandler({DuplicateException.class, InsufficientBalanceException.class, PinException.class})
     public ResponseEntity<ApiResponse<Void>> handleBadRequests(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
     }
 
+    /**
+     * Handles field-level validation failures (e.g., @NotBlank, @Email).
+     *
+     * @param ex {@link MethodArgumentNotValidException} from validation framework
+     * @return response with detailed field error messages
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Map<String, String>>> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
@@ -36,20 +58,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors));
     }
 
-    // ✅ Menangani validasi di level service/repo (misalnya pakai Validator manual)
-//    @ExceptionHandler(ConstraintViolationException.class)
-//    public ResponseEntity<ApiResponse<Map<String, String>>> handleConstraintViolation(ConstraintViolationException ex) {
-//        Map<String, String> errors = new HashMap<>();
-//        ex.getConstraintViolations().forEach(violation -> {
-//            String field = violation.getPropertyPath().toString();
-//            errors.put(field, violation.getMessage());
-//        });
-//
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors));
-//    }
+    /**
+     * Handles the case when a wallet already exists for the user.
+     *
+     * @param ex the thrown {@link WalletAlreadyExistsException}
+     * @return 400 response with specific error message
+     */
+    @ExceptionHandler(WalletAlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleWalletExists(WalletAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
+    }
 
-    // ✅ Global handler fallback
+    /**
+     * Catches any uncaught or generic exceptions and maps known auth-related ones to proper responses.
+     *
+     * @param exception the caught {@link Exception}
+     * @return mapped HTTP response with relevant message
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGlobalException(Exception exception) {
         exception.printStackTrace(); // TODO: Integrate with observability/logging system

@@ -31,11 +31,12 @@ public class UserController {
      * Retrieve a user by their ID.
      *
      * @param id the ID of the user
-     * @return the corresponding user as a UserResponse
+     * @return the corresponding user wrapped in an ApiResponse
      */
     @GetMapping("/{id}")
-    public UserResponseDto getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+    public ResponseEntity<ApiResponse<UserResponseDto>> getUserById(@PathVariable Long id) {
+        UserResponseDto userDto = userService.getUserById(id);
+        return ResponseEntity.ok(ApiResponse.success("User fetched successfully", userDto));
     }
 
     /**
