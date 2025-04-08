@@ -5,8 +5,6 @@ import com.odp.walled.dto.auth.LoginResponseDto;
 import com.odp.walled.dto.auth.PinRequestDto;
 import com.odp.walled.dto.auth.RegisterRequestDto;
 import com.odp.walled.dto.common.ApiResponse;
-import com.odp.walled.dto.user.UserResponseDto;
-import com.odp.walled.mapper.UserMapper;
 import com.odp.walled.model.User;
 import com.odp.walled.service.AuthenticationService;
 import com.odp.walled.service.JwtService;
@@ -24,24 +22,26 @@ public class AuthenticationController {
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
     private final RefreshTokenService refreshTokenService;
-    private final UserMapper userMapper;
 
-    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, RefreshTokenService refreshTokenService, UserMapper userMapper) {
+    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, RefreshTokenService refreshTokenService) {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
         this.refreshTokenService = refreshTokenService;
-        this.userMapper = userMapper;
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<UserResponseDto>> register(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
-
+    public ResponseEntity<ApiResponse<LoginResponseDto>> register(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
         User user = authenticationService.signup(registerRequestDto);
-        UserResponseDto dto = userMapper.toResponse(user);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(HttpStatus.CREATED.value(), "User registered successfully.", dto));
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        refreshTokenService.createRefreshToken(user.getEmail(), refreshToken, jwtService.getRefreshTokenExpiration());
+
+        LoginResponseDto response = new LoginResponseDto().setAccessToken(accessToken).setRefreshToken(refreshToken);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(HttpStatus.CREATED.value(), "User registered and logged in successfully", response));
     }
-
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponseDto>> authenticate(@RequestBody LoginRequestDto loginUserDto) {
@@ -52,7 +52,7 @@ public class AuthenticationController {
 
         refreshTokenService.createRefreshToken(authenticatedUser.getEmail(), refreshToken, jwtService.getRefreshTokenExpiration());
 
-        LoginResponseDto loginResponse = new LoginResponseDto().setAccessToken(accessToken).setRefreshToken(refreshToken).setExpiresIn(jwtService.getAccessTokenExpiration());
+        LoginResponseDto loginResponse = new LoginResponseDto().setAccessToken(accessToken).setRefreshToken(refreshToken);
 
         return ResponseEntity.ok(ApiResponse.success("Login successful", loginResponse));
     }
@@ -74,7 +74,7 @@ public class AuthenticationController {
         String email = jwtService.extractUsername(refreshToken);
         String newAccessToken = jwtService.generateAccessToken(authenticationService.loadUserByUsername(email));
 
-        LoginResponseDto response = new LoginResponseDto().setAccessToken(newAccessToken).setRefreshToken(refreshToken).setExpiresIn(jwtService.getAccessTokenExpiration());
+        LoginResponseDto response = new LoginResponseDto().setAccessToken(newAccessToken).setRefreshToken(refreshToken);
 
         return ResponseEntity.ok(ApiResponse.success("Token refreshed successfully", response));
     }

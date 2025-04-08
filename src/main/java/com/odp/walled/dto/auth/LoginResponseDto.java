@@ -7,8 +7,6 @@ public class LoginResponseDto {
     private String accessToken;
     private String refreshToken;
 
-    private long expiresIn;
-
     public LoginResponseDto setAccessToken(String accessToken) {
         this.accessToken = accessToken;
         return this;
@@ -19,13 +17,8 @@ public class LoginResponseDto {
         return this;
     }
 
-    public LoginResponseDto setExpiresIn(long expiresIn) {
-        this.expiresIn = expiresIn;
-        return this;
-    }
-
     @Override
     public String toString() {
-        return "LoginResponse{" + "accessToken='" + accessToken + '\'' + ", refreshToken='" + refreshToken + '\'' + ", expiresIn=" + expiresIn + '}';
+        return "LoginResponse{" + "accessToken='" + accessToken + '\'' + ", refreshToken='" + refreshToken + '}';
     }
 }
