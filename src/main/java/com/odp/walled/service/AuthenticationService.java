@@ -37,7 +37,7 @@ public class AuthenticationService implements UserDetailsService {
             throw new DuplicateException("Phone number already in use.");
         }
 
-        User newUser = User.builder().email(input.getEmail()).fullName(input.getFullName()).password(passwordEncoder.encode(input.getPassword())).phoneNumber(input.getPhoneNumber()).build();
+        User newUser = User.builder().email(input.getEmail()).fullName(input.getFullName()).password(passwordEncoder.encode(input.getPassword())).phoneNumber(input.getPhoneNumber()).avatarUrl(input.getAvatarUrl()).build();
 
         return userRepository.save(newUser);
     }

@@ -23,6 +23,8 @@ public class RegisterRequestDto {
     @NotBlank(message = "Phone number is required")
     private String phoneNumber;
 
+    private String avatarUrl;
+
     public RegisterRequestDto setEmail(String email) {
         this.email = email;
         return this;
