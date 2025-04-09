@@ -82,7 +82,7 @@ public class TransactionController {
     public ResponseEntity<ApiResponse<TransactionResponseDto>> topUp(@AuthenticationPrincipal User user, @RequestBody TopUpRequestDto request) {
 
         TransactionResponseDto response = transactionService.topUp(user, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("Top-up successful", response));
+        return ResponseEntity.ok(ApiResponse.success("Top-up successful", response));
     }
 
     /**
@@ -96,6 +96,6 @@ public class TransactionController {
     public ResponseEntity<ApiResponse<TransactionResponseDto>> transfer(@AuthenticationPrincipal User user, @RequestBody TransferRequestDto request) {
 
         TransactionResponseDto response = transactionService.transfer(user, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("Transfer successful", response));
+        return ResponseEntity.ok(ApiResponse.success("Transfer successful", response));
     }
 }
