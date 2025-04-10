@@ -95,19 +95,24 @@ public class TransactionService {
 
         validateTransferRequest(sender, request);
 
-        Wallet recipient = getWalletById(request.getRecipientWalletId());
-
         sender.setBalance(sender.getBalance().subtract(request.getAmount()));
-        recipient.setBalance(recipient.getBalance().add(request.getAmount()));
-
         walletRepository.save(sender);
-        walletRepository.save(recipient);
 
-        Transaction transaction = Transaction.builder().wallet(sender).recipientWallet(recipient).amount(request.getAmount()).transactionType(TransactionType.TRANSFER).description(request.getDescription()).transactionDate(LocalDateTime.now()).build();
+        Transaction.TransactionBuilder transactionBuilder = Transaction.builder().wallet(sender).amount(request.getAmount()).transactionType(TransactionType.TRANSFER).description(request.getDescription()).transactionDate(LocalDateTime.now());
+
+        if (!Boolean.TRUE.equals(request.getIsSedekah())) {
+            Wallet recipient = getWalletById(request.getRecipientWalletId());
+            recipient.setBalance(recipient.getBalance().add(request.getAmount()));
+            walletRepository.save(recipient);
+            transactionBuilder.recipientWallet(recipient);
+        }
+
+        Transaction transaction = transactionBuilder.build();
 
         transactionRepository.save(transaction);
         return transactionMapper.toResponse(transaction);
     }
+
 
     /**
      * Get all transactions related to the authenticated user.

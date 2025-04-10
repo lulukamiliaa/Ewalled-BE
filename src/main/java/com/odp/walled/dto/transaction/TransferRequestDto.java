@@ -32,4 +32,9 @@ public class TransferRequestDto {
      */
     @Size(max = 255, message = "Description must not exceed 255 characters")
     private String description;
+
+    /**
+     * Optional flagging for the sedekah transaction.
+     */
+    private Boolean isSedekah;
 }
