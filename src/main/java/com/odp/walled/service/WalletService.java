@@ -64,13 +64,12 @@ public class WalletService {
      * Retrieves a wallet using the associated user ID.
      *
      * @param userId the user ID
-     * @return the {@link WalletResponseDto}
-     * @throws ResourceNotFound if the wallet does not exist for the given user
+     * @return the {@link WalletResponseDto} or null if not found
      */
     public WalletResponseDto getWalletByUserId(Long userId) {
-        Wallet wallet = walletRepository.findByUserId(userId).orElseThrow(() -> new ResourceNotFound("Wallet not found for user ID: " + userId));
-        return walletMapper.toResponse(wallet);
+        return walletRepository.findByUserId(userId).map(walletMapper::toResponse).orElse(null);
     }
+
 
     /**
      * Generates a unique 12-digit numeric account number.

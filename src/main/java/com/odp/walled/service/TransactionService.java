@@ -6,6 +6,7 @@ import com.odp.walled.dto.transaction.TransactionResponseDto;
 import com.odp.walled.dto.transaction.TransferRequestDto;
 import com.odp.walled.exception.InsufficientBalanceException;
 import com.odp.walled.exception.ResourceNotFound;
+import com.odp.walled.exception.BadRequestException;
 import com.odp.walled.mapper.TransactionMapper;
 import com.odp.walled.model.Transaction;
 import com.odp.walled.model.Transaction.TransactionType;
@@ -93,6 +94,9 @@ public class TransactionService {
     public TransactionResponseDto transfer(User user, TransferRequestDto request) {
         Wallet sender = getWalletByUserId(user.getId());
 
+        if (!Boolean.TRUE.equals(request.getIsSedekah()) && sender.getId().equals(request.getRecipientWalletId())) {
+            throw new BadRequestException("Cannot transfer to the same wallet");
+        }
         validateTransferRequest(sender, request);
 
         sender.setBalance(sender.getBalance().subtract(request.getAmount()));
@@ -108,7 +112,6 @@ public class TransactionService {
         }
 
         Transaction transaction = transactionBuilder.build();
-
         transactionRepository.save(transaction);
         return transactionMapper.toResponse(transaction);
     }

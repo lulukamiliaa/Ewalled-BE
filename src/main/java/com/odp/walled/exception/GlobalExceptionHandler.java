@@ -39,9 +39,10 @@ public class GlobalExceptionHandler {
      * @param ex the thrown {@link RuntimeException} (e.g., duplicate, balance, or PIN errors)
      * @return standardized 400 response
      */
-    @ExceptionHandler({DuplicateException.class, InsufficientBalanceException.class, PinException.class})
+    @ExceptionHandler({DuplicateException.class, InsufficientBalanceException.class, PinException.class, BadRequestException.class})
     public ResponseEntity<ApiResponse<Void>> handleBadRequests(RuntimeException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
     }
 
     /**

@@ -10,6 +10,7 @@ import com.odp.walled.model.User;
 import com.odp.walled.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -93,7 +94,7 @@ public class TransactionController {
      * @return transaction response after transfer
      */
     @PostMapping("/transfer")
-    public ResponseEntity<ApiResponse<TransactionResponseDto>> transfer(@AuthenticationPrincipal User user, @RequestBody TransferRequestDto request) {
+    public ResponseEntity<ApiResponse<TransactionResponseDto>> transfer(@AuthenticationPrincipal User user, @RequestBody TransferRequestDto request) throws BadRequestException {
 
         TransactionResponseDto response = transactionService.transfer(user, request);
         return ResponseEntity.ok(ApiResponse.success("Transfer successful", response));
