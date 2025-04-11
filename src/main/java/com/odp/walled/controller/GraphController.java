@@ -10,29 +10,30 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Controller that handles analytics and graph-related endpoints,
+ * such as providing summarized financial data for a specific wallet.
+ */
 @RestController
 @RequestMapping("/api/analytics")
 @RequiredArgsConstructor
 public class GraphController {
+
+    /**
+     * Service responsible for fetching graph summary data.
+     */
     private final GraphService graphService;
 
+    /**
+     * Retrieves a summary of income and expenses grouped by category or time period
+     * for the specified wallet.
+     *
+     * @param walletId the ID of the wallet to summarize
+     * @param period   optional time period filter (e.g., "weekly", "monthly", "quarterly")
+     * @return a list of {@link GraphSummaryResponse} objects representing summarized data
+     */
     @GetMapping("/summary")
     public List<GraphSummaryResponse> getSummaryByWallet(@RequestParam Long walletId, @RequestParam(required = false) String period) {
         return graphService.getSummaryByWallet(walletId, period);
     }
-
-    // @GetMapping("/bar-chart")
-    // public ResponseEntity<ApiResponse<List<GraphDataResponse>>> getGraphDataByWallet(@RequestParam Long walletId,
-    //         @RequestParam(required = false) String period) {
-
-    //     List<GraphDataResponse> graphData = graphService.getGraphDataByWallet(walletId, period);
-
-    //     ApiResponse<List<GraphDataResponse>> response = new ApiResponse<>(
-    //             "success",
-    //             HttpStatus.OK.value(),
-    //             graphData);
-
-    //     return ResponseEntity.ok(response);
-    // }
-
 }
